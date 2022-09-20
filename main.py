@@ -5,10 +5,10 @@ import json
 def gera_lista():
     linha = []
 
-    tamanhoLista = random.randint(4000,20000)
+    tamanhoLista = random.randint(2000000,4000000)#trabalhando com instâncias que tornam o problema NP-Dificil 
 
     for c2 in range(0, tamanhoLista):
-         valor = random.randint(1,50)
+         valor = random.randint(1,100)
          linha.append(valor)
 
     with open("teo.json", "w") as wfile:
@@ -47,7 +47,7 @@ def get_GreedyFofo(lista, tamanho_lista, alvo):
     lista_greedy = [] # lista temporaria pra nao fazer alteracoes na lista original 
     cont = 0
     lista_greedy = lista.copy()
-    print("lista greedy", lista_greedy)
+    #print("lista greedy", lista_greedy)
     somatorio = alvo
     j = 0
 
@@ -184,28 +184,29 @@ if __name__ == "__main__":
     ### Caso 1 - Gerando lista e setando o alvo
     gera_lista()
     lista = get_lista()
-    alvo = 100
+    alvo = 102
     tamanho_lista = len(lista)
 
     otimo = []
-    print("cheguei aqui tb")
+    print("cheguei aqui, na main, vou rodar o greedy")
 
     otimo = get_GreedyFofo(lista,tamanho_lista,alvo) # primeira interacao do guloso,
     vetorzinho = []
     troca = []
     k = 1
-    l = 2
+    l = 1
     f = 0
-    cont = tamanho_lista
+    cont = 10
     vetoraux = []
     vetor_temp = []
     
-
+    print("iniciando o descent")
     while(l<cont):# o codigo aguenta valores maiores que isso, porem demora e nao muda nada (aqui e onde eu faço o switch de l posicoes no vetor)
         descent = get_descentS(lista,otimo,l)
         #while(f < len(descent)):
             #vetoraux.append(descent[f])
             #f = f + 1 
+        print("Rodando o descent, iteracao : ", l )
         vetoraux = descent.copy()
 
         l = l + 1
@@ -222,7 +223,9 @@ if __name__ == "__main__":
     trocador = lista.copy()
 
     vectork = []
-    while(k<tamanho_lista-2): #podemos aumentar ou diminuir o k livremente
+    print("iniciando o k swap")
+    while(k<10): #podemos aumentar ou diminuir o k livremente
+        print("Rodando o k-swap, interacao : ", k )
         if(sum(lista)< alvo): # protecao pra ver se a lista chega no valor alvo
             break
         trocador = get_TrocaPosicao(trocador,k) #funcao pra trocar a posicao com um raio de tamanho k na lista
@@ -236,10 +239,10 @@ if __name__ == "__main__":
 
     vetorzinho = lista.copy()
     vetorzinho.sort(reverse=True)
-    print("vetor original = ", lista)
-    print("vetor ordenado para melhor visualização = ", vetorzinho)
+    #print("vetor original = ", lista)
+    #print("vetor ordenado para melhor visualização = ", vetorzinho)
 
-    if(sum(vectork) == 100 or sum(otimo) == 100 or sum(vetor_temp) == 100):
+    if(sum(vectork) == alvo or sum(otimo) == alvo or sum(vetor_temp) == alvo):
         print("foi encontrado um subset correspondente ao alvo")
     else:
         print("nenhum subset foi encontrado")
@@ -248,7 +251,7 @@ if __name__ == "__main__":
     print("troca = ", vectork)
     print("descend swap vector : ", vetor_temp)
     print("soma do guloso = ",sum(otimo))
-    print("soma da troca = ",sum(vectork)) # o ideal é que aqui resulte em um TAMANHO maior que o  do ótimo com a mesma soma
+    print("soma da troca = ",sum(vectork)) 
     print("soma do vetor com a troca de pos = ", sum(vetor_temp))
     print("tamanho do vetor descent= " , len(vetor_temp))
     print("tamanho do guloso = ", len(otimo))
@@ -256,7 +259,7 @@ if __name__ == "__main__":
     print("alvo = ", alvo)
     print("numero de trocas de posicoes do Descent checadas = ", l)
     print("tamanho da lista", tamanho_lista)
-    print("k-swaps feitos para resultar na melhor troca possivel =", k-1)
+    print("numero de realizações do k-swap =", k-1)
    
    
     # print("lista sorteada", lista)
