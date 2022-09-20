@@ -1,6 +1,7 @@
 from audioop import reverse
 import random
 import json
+from timeit import default_timer as timer
 
 def gera_lista():
     linha = []
@@ -22,7 +23,7 @@ def get_lista():
     return data
 
 
-def get_TrocaPosicao(lista,k):
+def get_TrocaPosicao(lista,k): # função para comparar a troca de posições no vetor inteiro ao invés da troca na solução (VND)
 
     i = 0
     temp = 0
@@ -39,7 +40,7 @@ def get_TrocaPosicao(lista,k):
     
 
 
-def get_GreedyFofo(lista, tamanho_lista, alvo):
+def get_GreedyFofo(lista, tamanho_lista, alvo):# Algoritmo guloso
     peso = 0
     contador = 0
     temp = 0
@@ -74,7 +75,8 @@ def get_GreedyFofo(lista, tamanho_lista, alvo):
 
     return opt 
 
-def get_descentS(lista,otimo,l):
+def get_descentS(lista,otimo,l): # VND # IDEIA -> SALVAR A POSICAO  DA SOLUCAO PEGA ( AO RODAR O GREEDY ), E, AO INVES DE PERCORRER O VETOR
+                                 # SO IR FAZENDO AS ALTERACOES NA POSICAO SALVA ( COM OS DEVIDOS INCREMENTOS)
     tamanho_lista = len(lista)
     descent = []
     i = 0
@@ -110,7 +112,7 @@ def get_descentS(lista,otimo,l):
     return descent
 
 
-def get_Vizinhos_Otimizadinhos(opt,lista,alvo):
+def get_Vizinhos_Otimizadinhos(opt,lista,alvo): #Em construção.
   troca = [] 
   new_Lista = []
   new_list = lista
@@ -164,7 +166,7 @@ def get_Vizinhos_Otimizadinhos(opt,lista,alvo):
 
 
 
-def get_SubsetSum(lista, tamanho_lista, alvo):
+def get_SubsetSum(lista, tamanho_lista, alvo):# Heuristica de Construção Inicial 
     # Casos Bases
     if (alvo == 0):
         return True
@@ -180,28 +182,33 @@ def get_SubsetSum(lista, tamanho_lista, alvo):
         lista, tamanho_lista - 1, alvo - lista[tamanho_lista - 1])
 
 
-if __name__ == "__main__":
+if __name__ == "__main__": # Main
     ### Caso 1 - Gerando lista e setando o alvo
-    gera_lista()
+    gera_lista() 
     lista = get_lista()
-    alvo = 102
+    alvo = 102 # alvo setado na mão para maior confiabilidade.
     tamanho_lista = len(lista)
 
-    otimo = []
-    print("cheguei aqui, na main, vou rodar o greedy")
+    otimo = [] # vetor à ser armazenado a solução do guloso
+    print("cheguei aqui, na main, vou rodar o greedy") #print para acompanhamento da evolução do algoritmo
+
 
     otimo = get_GreedyFofo(lista,tamanho_lista,alvo) # primeira interacao do guloso,
-    vetorzinho = []
-    troca = []
-    k = 1
-    l = 1
-    f = 0
-    cont = 10
-    vetoraux = []
-    vetor_temp = []
+    vetorzinho = [] # vetor temporario
+    troca = [] # vetor a ser armazenado a solução do k-swap
+    k = 1 # variavel para os swaps de posicao na função de troca de posição
+    l = 1 # variavel para a iteração do descent
+    #f = 0 
+    tempo = 0 # variavel para auxilio no controle do benchmark
+    cont = 10 # variavel de parada do descent
+    vetoraux = [] #vetor temporario
+    vetor_temp = [] #vetor À ser armazenado a solução do descent
     
     print("iniciando o descent")
-    while(l<cont):# o codigo aguenta valores maiores que isso, porem demora e nao muda nada (aqui e onde eu faço o switch de l posicoes no vetor)
+    start = timer() #iniciando o benchmark..
+
+   
+    while(l<cont):# rodo o greedy à cada iteração do VND e verifico se a solução é melhor, se for, é a nova solução.
         descent = get_descentS(lista,otimo,l)
         #while(f < len(descent)):
             #vetoraux.append(descent[f])
@@ -211,20 +218,27 @@ if __name__ == "__main__":
 
         l = l + 1
         vetoraux = get_GreedyFofo(descent,tamanho_lista,alvo)
-        if(len(vetor_temp) < len(vetoraux)):
+        if(len(vetor_temp) < len(vetoraux)): # local onde faço a verificação de tamanho dos dois vetores, buscando o maior vetor.
             vetor_temp = vetoraux.copy()
 
-        if(len(vetor_temp) > len(otimo) and l+1 == cont):
+        if(len(vetor_temp) > len(otimo) and l+1 == cont):  
             break
 
-        
+    end = timer()
+    print("tempo de execucao da funcao descent : " ,end - start)
+    tempo = end - start   
+    
 # fim while com o incremento no l, objetivo é switar as posiçoes da primeira soluçao ate achar uma melhor
+   
+ 
     trocador = []
     trocador = lista.copy()
 
     vectork = []
     print("iniciando o k swap")
-    while(k<10): #podemos aumentar ou diminuir o k livremente
+
+   
+    while(k<10): #podemos aumentar ou diminuir o cont livremente
         print("Rodando o k-swap, interacao : ", k )
         if(sum(lista)< alvo): # protecao pra ver se a lista chega no valor alvo
             break
@@ -235,6 +249,8 @@ if __name__ == "__main__":
         if(len(vectork) < len(troca)): # vendo se achei um vetor melhor que na primeira interacao do guloso ( otimo )
             vectork = troca.copy()
 
+    end = timer()
+    print("tempo de execucao da funcao: k-swap" , (end - start) - tempo)   
 
 
     vetorzinho = lista.copy()
@@ -247,20 +263,20 @@ if __name__ == "__main__":
     else:
         print("nenhum subset foi encontrado")
 
-    print("otimo = ", otimo)
-    print("troca = ", vectork)
-    print("descend swap vector : ", vetor_temp)
-    print("soma do guloso = ",sum(otimo))
-    print("soma da troca = ",sum(vectork)) 
-    print("soma do vetor com a troca de pos = ", sum(vetor_temp))
-    print("tamanho do vetor descent= " , len(vetor_temp))
-    print("tamanho do guloso = ", len(otimo))
-    print("tamanho da troca = ", len(vectork))
-    print("alvo = ", alvo)
-    print("numero de trocas de posicoes do Descent checadas = ", l)
+    print("greedy = ", otimo)
+    print("k-swap = ", vectork)
+    print("Descent : ", vetor_temp)
+    print("soma do Greedy = ",sum(otimo))
+    print("soma do K-swap = ",sum(vectork)) 
+    print("soma do Descent  = ", sum(vetor_temp))
+    print("tamanho do Descent= " , len(vetor_temp))
+    print("tamanho do Greedy = ", len(otimo))
+    print("tamanho do K-swap = ", len(vectork))
+    print("target = ", alvo)
+    print("numero de trocas no Descent = ", l)
     print("tamanho da lista", tamanho_lista)
-    print("numero de realizações do k-swap =", k-1)
-   
+    print("numero de trocas no K-swap =", k)
+
    
     # print("lista sorteada", lista)
     ## Caso 2 - Lista pré definida e alvo pré definido
